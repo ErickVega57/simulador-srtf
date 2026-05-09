@@ -6,9 +6,9 @@ import java.util.Iterator;
 
 public class Simulacion {
 
-    private ColaLlegada colaLlegada;
-    private ColaRafaga colaRafaga;
-    private ArrayList<Proceso> finalizados;
+    private final ColaLlegada colaLlegada;
+    private final ColaRafaga colaRafaga;
+    private final ArrayList<Proceso> finalizados;
 
     public Simulacion(){
         colaLlegada = new ColaLlegada();
@@ -18,112 +18,79 @@ public class Simulacion {
 
     public ResultadoSimulacion simulacionSRTF(){
         llenarColaLlegada();
+
         int tiempo = 0;
         double duracionCambioContexto = 0.2;
         Planificador planificador = new Planificador();
-        RegistroEstados re = new RegistroEstados();
+        RegistroEstados registroEstados = new RegistroEstados();
         int contCambios = 0;
         int numFinalizados = finalizados.size();
-
         int numProcesos = colaLlegada.size();
-        System.out.println(colaLlegada.size());
 
         while (numFinalizados < numProcesos ) {
-            System.out.println("TIEMPO >" + tiempo);
             while (colaLlegada.llegoProceso(tiempo)){
                 colaRafaga.agregarProceso(colaLlegada.getSiguiente());
-                System.out.println("Llego proceso en tiempo " + tiempo);
             }
 
             if(planificador.hayProcesoEnEjecucion() && planificador.getEnEjecucion().getTiempoRestante() == 0){
-                System.out.println("El proceso " + planificador.getEnEjecucion().getId() + " ha finalizado");
-                Proceso finalizado = planificador.quitarProceso();
-                finalizado.setTiempoFinalizado(tiempo);
-                finalizados.add(finalizado);
-                System.out.println("FIN ESTADO");
-                re.setFinEstado(tiempo);
-
+                // si hay proceso en ejecucion y le queda 0, el proceso finalizo
+                Proceso finalizado = planificador.quitarProceso();  // se quita el proceso
+                finalizado.setTiempoFinalizado(tiempo);   //se marca el tiempo que finalizo
+                finalizados.add(finalizado);  //se agrega a la lista de finalizados
+                registroEstados.setFinEstado(tiempo);    //se guarda el fin del estado (timeline)
                 numFinalizados++;
 
                 if(colaRafaga.estaVacia() && numFinalizados < numProcesos){
                     // suma el cambio de contexto cuando se quita un proceso
                     // solo si no hay procesos esperando y no es ultimo
                     contCambios ++;
-                    System.out.println("[1]==CAMBIO DE CONTEXTO==");
                 }
-
             }
 
-
             if(!colaRafaga.estaVacia()){
-                System.out.println("Frente de la cola = Proceso " + colaRafaga.verFrente().getId());
-                //llego un proceso en este tiempo
-                System.out.println("Hay procesos en la cola ");
-
-
+                //cola no vacia
                 if(planificador.hayProcesoEnEjecucion()){
-                    System.out.println("[inicio]se esta ejecutando el Proceso"
-                            + planificador.getEnEjecucion().getId());
-
+                    //hay un proceso ejecutandose
                     if(compararTiempos(planificador.getEnEjecucion(),colaRafaga.verFrente())){
+                        //comparo tiempos restantes procesoactual con frente de la cola
                         Proceso anterior = planificador.cambioContexto(colaRafaga.getSiguiente());
                         colaRafaga.agregarProceso(anterior);
-
-                        re.setFinEstado(tiempo);
-                        System.out.println("FIN ESTADO");
-                        re.registrarEstado(planificador.getEnEjecucion(), tiempo);
-                        System.out.println("NUEVO ESTADO");
-
-
-                        System.out.println("[ahora]se esta ejecutando el Proceso"
-                                + planificador.getEnEjecucion().getId());
+                        registroEstados.setFinEstado(tiempo);
+                        registroEstados.registrarEstado(planificador.getEnEjecucion(), tiempo);
                         contCambios ++; // cuenta el cambio de contexto
-                        sumarEspera(duracionCambioContexto);
-                        System.out.println("\n[2]==CAMBIO DE CONTEXTO==\n");
-
+                        sumarEspera(duracionCambioContexto); //suma cc a los procesos que ya llegaron
                     }
                 }else{
-                    System.out.println("No se esta ejecutando ningun proceso");
-                    planificador.ponerProceso(colaRafaga.getSiguiente());
-                    System.out.println("[ahora]se esta ejecutando el Proceso"
-                            + planificador.getEnEjecucion().getId());
-
-                    System.out.println("INICIO ESTADO");
-                    re.registrarEstado(planificador.getEnEjecucion(), tiempo);
+                   //no hay procesos en ejecucion
+                    planificador.ponerProceso(colaRafaga.getSiguiente());  // se pone en ejecucion al frente de la cola
+                    registroEstados.registrarEstado(planificador.getEnEjecucion(), tiempo);  // se inicia el estado(timeline)
 
                     if(tiempo != 0){
                         //suma cuando se pone un proceso si no es en tiempo 0
                         contCambios ++;
                         sumarEspera(duracionCambioContexto);
-                        System.out.println("\n[3]==CAMBIO DE CONTEXTO==\n");
                     }
                 }
             }
 
-
             if(planificador.hayProcesoEnEjecucion()){
-                System.out.println("TIENE: " +planificador.getEnEjecucion().getTiempoRestante() + " restante");
                 planificador.ejecutarProceso();
             }
 
             tiempo ++;
         }
 
-        re.recorrerEstados();
-        double tep = calcularTiempoEspera();
-        System.out.println("TEP = " + tep);
-        double tte = calcularTiempoTotal(tiempo-1,contCambios,duracionCambioContexto);
-        System.out.println("TTE = " +tte);
-        return new ResultadoSimulacion(finalizados,re,tep,tte);
+        return new ResultadoSimulacion(finalizados,registroEstados,calcularTiempoEspera(),calcularTiempoTotal(tiempo-1,contCambios,duracionCambioContexto));
     }
 
     public boolean compararTiempos(Proceso p1, Proceso p2){
+        //compara tiempos restantes de dos procesos
+        //retorna true si p1 le queda mas tiempo que p2
         return p1.getTiempoRestante() > p2.getTiempoRestante();
     }
 
 
     public void llenarColaLlegada(){
-        System.out.println("LENAR COLA");
         Proceso p1 = new Proceso(1,5,1);
         Proceso p2 = new Proceso(2,4,2);
         Proceso p3 = new Proceso(3,1,5);
@@ -145,7 +112,6 @@ public class Simulacion {
             Proceso p = iterador.next();
             double tiempoEspera = p.getTiempoDeEspera();
             p.setTiempoDeEspera( tiempoEspera + tiempoCambioContexto);
-            System.out.println("SUMO TE" + p.getTiempoDeEspera());
             haySiguiente = iterador.hasNext();
         }
     }
@@ -153,6 +119,7 @@ public class Simulacion {
     public double calcularTiempoEspera(){
         double tep = 0.0;
         for (Proceso p : finalizados) {
+            //tiempo espera = tiempo que finalizo el proceso - tiempo que llego - tiempo de rafaga + los cambios de contexto que vivio
             p.setTiempoDeEspera(p.getTiempoFinalizado() - p.getTiempoLlegada() -
                     p.getTiempoRafaga() + p.getTiempoDeEspera());
             tep += p.getTiempoDeEspera();
@@ -165,13 +132,10 @@ public class Simulacion {
     }
 
 
-
     public static void main(String[] args) {
         Simulacion s = new Simulacion();
         ResultadoSimulacion r = s.simulacionSRTF();
-        System.out.println("Tiempo espera p2");
-        System.out.println(r.getTiempoEsperaProceso(2));
-        System.out.println(r.getPorcentajeEjecucion());
+        r.getRegistroEstados().recorrerEstados();
     }
 
 

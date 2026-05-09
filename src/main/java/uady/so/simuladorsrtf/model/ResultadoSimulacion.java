@@ -7,10 +7,10 @@ import java.util.ArrayList;
 
 public class ResultadoSimulacion {
 
-    private ArrayList<Proceso> listaProcesos;
-    private RegistroEstados registroEstados;
-    private double tiempoEsperaPromedio;
-    private double tiempoTotalProceso;
+    private final ArrayList<Proceso> listaProcesos;
+    private final RegistroEstados registroEstados;
+    private final double tiempoEsperaPromedio;
+    private final double tiempoTotalProceso;
 
     public ResultadoSimulacion(ArrayList<Proceso> listaProcesos, RegistroEstados registroEstados,
                                double tiempoEsperaPromedio, double tiempoTotalProceso) {
