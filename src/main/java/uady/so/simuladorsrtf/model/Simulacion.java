@@ -91,11 +91,11 @@ public class Simulacion {
 
 
     public void llenarColaLlegada(){
-        Proceso p1 = new Proceso(1,5,1);
-        Proceso p2 = new Proceso(2,4,2);
-        Proceso p3 = new Proceso(3,1,5);
-        Proceso p4 = new Proceso(4,8,7);
-        Proceso p5 = new Proceso(5,3,5);
+        Proceso p1 = new Proceso(1,8,0);
+        Proceso p2 = new Proceso(2,4,3);
+        Proceso p3 = new Proceso(3,2,6);
+        Proceso p4 = new Proceso(4,3,10);
+        Proceso p5 = new Proceso(5,6,20);
         colaLlegada.agregarProceso(p1);
         colaLlegada.agregarProceso(p2);
         colaLlegada.agregarProceso(p3);

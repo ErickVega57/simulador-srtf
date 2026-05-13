@@ -1,5 +1,7 @@
 package uady.so.simuladorsrtf.model.clases;
 
+import javafx.scene.paint.Color;
+
 public class Proceso {
 
     private final int id;
@@ -10,12 +12,15 @@ public class Proceso {
     private double tiempoDeEspera = 0;
     private boolean finalizado = false;
     private int tiempoFinalizado;
+    private Color colorProceso;
+    private static final AsignarColor color = new AsignarColor();
 
     public Proceso(int id, int tiempoRafaga, int tiempoLlegada) {
         this.id = id;
         this.tiempoRafaga = tiempoRafaga;
         this.tiempoLlegada = tiempoLlegada;
         this.tiempoRestante = tiempoRafaga;
+        this.colorProceso = color.asignaColor();
     }
 
     public int getId() {
@@ -68,5 +73,9 @@ public class Proceso {
 
     public void setTiempoFinalizado(int tiempoFinalizado) {
         this.tiempoFinalizado = tiempoFinalizado;
+    }
+
+    public Color getColorProceso() {
+        return colorProceso;
     }
 }
