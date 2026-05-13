@@ -7,4 +7,5 @@ module uady.so.simuladorsrtf {
     exports uady.so.simuladorsrtf;
     exports uady.so.simuladorsrtf.controller;
     opens uady.so.simuladorsrtf.controller to javafx.fxml;
+    opens uady.so.simuladorsrtf.model.clases to javafx.base;
 }

@@ -32,7 +32,7 @@ public class ColaRafaga {
         cola.add(proceso);
     }
 
-    public Proceso getSiguiente(){
+    public Proceso sacarFrente(){
         return cola.poll();
     }
 

@@ -11,14 +11,16 @@ public class ResultadoSimulacion {
     private final RegistroEstados registroEstados;
     private final double tiempoEsperaPromedio;
     private final double tiempoTotalProceso;
+    private final int tiempoEjecucion;
 
     public ResultadoSimulacion(ArrayList<Proceso> listaProcesos, RegistroEstados registroEstados,
-                               double tiempoEsperaPromedio, double tiempoTotalProceso) {
+                               double tiempoEsperaPromedio, double tiempoTotalProceso, int tiempoEjecucion) {
 
         this.listaProcesos = listaProcesos;
         this.registroEstados = registroEstados;
         this.tiempoEsperaPromedio = tiempoEsperaPromedio;
         this.tiempoTotalProceso= tiempoTotalProceso;
+        this.tiempoEjecucion = tiempoEjecucion;
     }
 
     public ArrayList<Proceso> getListaProcesos() {
@@ -35,6 +37,10 @@ public class ResultadoSimulacion {
 
     public double getTiempoTotalProceso() {
         return tiempoTotalProceso;
+    }
+
+    public int getTiempoEjecucion(){
+        return tiempoEjecucion;
     }
 
     public double getPorcentajeEjecucion(){;

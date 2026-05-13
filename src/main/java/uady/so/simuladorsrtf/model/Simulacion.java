@@ -2,6 +2,7 @@ package uady.so.simuladorsrtf.model;
 import uady.so.simuladorsrtf.model.clases.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 
 public class Simulacion {
@@ -53,7 +54,10 @@ public class Simulacion {
                     //hay un proceso ejecutandose
                     if(compararTiempos(planificador.getEnEjecucion(),colaRafaga.verFrente())){
                         //comparo tiempos restantes procesoactual con frente de la cola
-                        Proceso anterior = planificador.cambioContexto(colaRafaga.getSiguiente());
+                        Proceso anterior = planificador.cambioContexto(colaRafaga.sacarFrente());
+                        planificador.getEnEjecucion().setTiempoDeEspera(
+                                planificador.getEnEjecucion().getTiempoDeEspera() + duracionCambioContexto
+                        );
                         colaRafaga.agregarProceso(anterior);
                         registroEstados.setFinEstado(tiempo);
                         registroEstados.registrarEstado(planificador.getEnEjecucion(), tiempo);
@@ -62,11 +66,14 @@ public class Simulacion {
                     }
                 }else{
                    //no hay procesos en ejecucion
-                    planificador.ponerProceso(colaRafaga.getSiguiente());  // se pone en ejecucion al frente de la cola
+                    planificador.ponerProceso(colaRafaga.sacarFrente());  // se pone en ejecucion al frente de la cola
                     registroEstados.registrarEstado(planificador.getEnEjecucion(), tiempo);  // se inicia el estado(timeline)
 
                     if(tiempo != 0){
                         //suma cuando se pone un proceso si no es en tiempo 0
+                        planificador.getEnEjecucion().setTiempoDeEspera(
+                                planificador.getEnEjecucion().getTiempoDeEspera() + duracionCambioContexto
+                        );
                         contCambios ++;
                         sumarEspera(duracionCambioContexto);
                     }
@@ -79,8 +86,8 @@ public class Simulacion {
 
             tiempo ++;
         }
-
-        return new ResultadoSimulacion(finalizados,registroEstados,calcularTiempoEspera(),calcularTiempoTotal(tiempo-1,contCambios,duracionCambioContexto));
+        ordenarLista(finalizados);
+        return new ResultadoSimulacion(finalizados,registroEstados,calcularTiempoEspera(),calcularTiempoTotal(tiempo-1,contCambios,duracionCambioContexto),tiempo-1);
     }
 
     public boolean compararTiempos(Proceso p1, Proceso p2){
@@ -89,13 +96,17 @@ public class Simulacion {
         return p1.getTiempoRestante() > p2.getTiempoRestante();
     }
 
+    public void ordenarLista(ArrayList<Proceso> procesos){
+        procesos.sort(Comparator.comparing(Proceso::getId));
+    }
+
 
     public void llenarColaLlegada(){
         Proceso p1 = new Proceso(1,8,0);
         Proceso p2 = new Proceso(2,4,3);
         Proceso p3 = new Proceso(3,2,6);
         Proceso p4 = new Proceso(4,3,10);
-        Proceso p5 = new Proceso(5,6,20);
+        Proceso p5 = new Proceso(5,6,15);
         colaLlegada.agregarProceso(p1);
         colaLlegada.agregarProceso(p2);
         colaLlegada.agregarProceso(p3);
@@ -116,6 +127,7 @@ public class Simulacion {
         }
     }
 
+
     public double calcularTiempoEspera(){
         double tep = 0.0;
         for (Proceso p : finalizados) {
@@ -129,13 +141,6 @@ public class Simulacion {
 
     public double calcularTiempoTotal(int t, int cc, double tiempoCambioContexto){
         return t + (cc * tiempoCambioContexto);
-    }
-
-
-    public static void main(String[] args) {
-        Simulacion s = new Simulacion();
-        ResultadoSimulacion r = s.simulacionSRTF();
-        r.getRegistroEstados().recorrerEstados();
     }
 
 
