@@ -60,7 +60,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>uady.so.simuladorsrtf/uady.so.simuladorsrtf.HelloApplication</mainClass>
+                            <mainClass>uady.so.simuladorsrtf/uady.so.simuladorsrtf.SimulacionApplication</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
