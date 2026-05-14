@@ -10,7 +10,7 @@ import java.io.IOException;
 public class SimulacionApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(SimulacionApplication.class.getResource("view/hello-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(SimulacionApplication.class.getResource("view/simulador-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 604, 522);
         stage.setTitle("Simulador de algoritmo SRJF");
         stage.setScene(scene);
